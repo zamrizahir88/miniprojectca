@@ -292,9 +292,11 @@
           <label><input type="checkbox" id="fifthMemberCheck" /> We have lecturer permission for a 5th member</label>
           <select id="member5Select" class="member-select" disabled><option value="">Member 5 (optional)</option></select>
         </div>
-        <div class="form-group">
+         <div class="form-group">
           <label><i class="fas fa-tag"></i> Project Title</label>
-          <select id="titleSelect" required><option value="">-- Choose a title --</option></select>
+          <div style="background:#1e293b; padding:12px; border-radius:8px; color:#f59e0b; text-align:center; font-weight:bold;">
+            🎲 Title will be randomly assigned upon submission
+          </div>
           <div id="titleError" class="error"></div>
         </div>
         <button type="submit" class="btn" id="submitBtn"><i class="fas fa-paper-plane"></i> Submit Registration</button>
@@ -618,7 +620,7 @@
     const teamName = document.getElementById('teamName').value.trim();
     const repMatric = document.getElementById('repSelect').value;
     const repEmail = document.getElementById('repEmail').value.trim();
-    const titleNum = document.getElementById('titleSelect').value;
+          // Auto-assign random title below
     const titleErr = document.getElementById('titleError');
     titleErr.textContent = '';
 
@@ -646,9 +648,14 @@
     }
 
     const regs = await getRegistrations();
-    if (regs[`title${titleNum}`]) {
-      titleErr.textContent = 'Title already taken. Please refresh and choose another.'; return;
-    }
+          // Randomly assign an available title
+      const available = TITLES.filter(t => !regs[`title${t.num}`]);
+      if (available.length === 0) {
+        if (titleErr) titleErr.textContent = 'No titles available. Contact lecturer.';
+        return;
+      }
+      const randomTitle = available[Math.floor(Math.random() * available.length)];
+      const titleNum = randomTitle.num;
     // Duplicate email check
     for (let [key, val] of Object.entries(regs)) {
       if (val.repEmail === repEmail) {
