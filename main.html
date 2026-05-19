@@ -223,7 +223,7 @@
       <h3><i class="fas fa-list-ol"></i> Available Titles (22)</h3>
       <div id="titleSummary" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:10px; color:var(--text);"></div>
     </div>
-        <div class="panel">
+    <div class="panel">
       <h3><i class="fas fa-file-pdf"></i> Technical Report Breakdown (max 10 pages)</h3>
       <div class="grid">
         <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>01. Front Page</strong><br><span style="color:#94a3b8;">Official template</span></div>
@@ -250,6 +250,7 @@
         </div>
       </div>
     </div>
+  </div>
 
   <!-- TAB: Register -->
   <div class="tab-content" id="tab-register">
@@ -723,6 +724,7 @@
     adminUnlocked = false;
     document.getElementById('adminLoginArea').classList.remove('hidden');
     document.getElementById('adminContent').classList.add('hidden');
+
   });
 
   async function renderAdminPanel() {
