@@ -166,9 +166,14 @@
       display: flex; align-items: center; justify-content: center; z-index: 1000;
     }
     .modal {
-      background: #111827; border: 1px solid var(--accent); border-radius: 20px;
+      background: #0f172a; border: 2px solid #38bdf8; border-radius: 20px;
       padding: 30px; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto;
+      color: #e2e8f0;
     }
+    .modal h2 { color: #38bdf8; }
+    .modal p { color: #e2e8f0; margin: 8px 0; }
+    .modal strong { color: #fff; }
+    .modal .btn { margin-top: 15px; }
     .hidden { display: none !important; }
     .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     @media (max-width: 800px) {
@@ -207,7 +212,7 @@
         </ul>
         <div class="gold-box">
           <strong style="color:var(--gold);">🔥 PROJECT THEME: Flag-Aware Architecture</strong><br>
-          <span style="color:#cbd5e1;">Engineer a datapath that correctly triggers <strong>Zero Flag</strong> and <strong>Carry Flag</strong> registers.</span>
+          <span style="color:#cbd5e1;">Design an 32-bits CPU with considering the <strong>Zero and Carry Flag</strong> register. The CPU can perform the following operations:</span>
         </div>
       </div>
       <div class="panel">
@@ -296,7 +301,7 @@
       <h3><i class="fas fa-table"></i> Live Registration Dashboard</h3>
       <div style="overflow-x:auto;">
         <table class="dashboard-table" id="dashboardTable">
-          <thead><tr><th>Title</th><th>Team</th><th>Members</th><th>Status</th></tr></thead>
+          <thead><tr><th>Title</th><th>Status</th><th>Team</th><th>Members</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -324,13 +329,14 @@
           </div>
           <div>
             <h4 style="color:var(--gold);">👨‍🎓 Manage Students</h4>
-            <div class="form-group"><label>Add Single Student (Name, Matric)</label>
+            <div class="form-group"><label style="color:#e2e8f0;">Add Single Student (Name, Matric)</label>
               <div class="flex-row"><input type="text" id="newStudentName" placeholder="Full name" /><input type="text" id="newStudentMatric" placeholder="Matric No." /><button class="btn btn-sm btn-green" id="addStudentBtn">Add</button></div>
             </div>
-            <div class="form-group"><label>Bulk Add (Name Matric per line)</label>
+            <div class="form-group"><label style="color:#e2e8f0;">Bulk Add (Name Matric per line)</label>
               <textarea id="bulkStudents" rows="3" placeholder="241373999 AHMAD FAUZI&#10;241374000 SITI NURHALIZA"></textarea>
               <button class="btn btn-sm" id="bulkAddBtn" style="margin-top:5px;">Bulk Add</button>
             </div>
+                        <div id="unassignedStudents" style="margin-bottom:15px; padding:10px; background:#1e293b; border-radius:8px; border-left:4px solid #ef4444;"></div>
             <div id="studentListAdmin" style="max-height:300px; overflow-y:auto; font-size:0.85rem;"></div>
           </div>
         </div>
@@ -573,14 +579,17 @@
 
   async function refreshDashboard() {
     const regs = await getRegistrations();
+    const students = await getStudentList();
+    const getName = (matric) => students.find(s => s.matric === matric)?.name || matric;
     const tbody = document.querySelector('#dashboardTable tbody');
+    if (!tbody) return;
     tbody.innerHTML = TITLES.map(t => {
       const r = regs[`title${t.num}`];
       return `<tr>
         <td><strong>Title ${t.num}</strong></td>
-        <td>${r ? r.teamName || '-' : '-'}</td>
-        <td>${r ? [r.m1, r.m2, r.m3, r.m4, r.m5].filter(Boolean).join(', ') : '-'}</td>
         <td>${r ? '<span class="badge">Taken</span>' : '<span class="badge badge-avail">Available</span>'}</td>
+        <td>${r ? r.teamName || '-' : '-'}</td>
+        <td>${r ? [r.m1, r.m2, r.m3, r.m4, r.m5].filter(Boolean).map(m => getName(m)).join(', ') : '-'}</td>
       </tr>`;
     }).join('');
   }
@@ -661,16 +670,18 @@
     const modal = document.getElementById('confirmModal');
     const content = document.getElementById('confirmContent');
     content.innerHTML = `
-      <h2 style="color:var(--accent);">✅ Registration Confirmed</h2>
-      <p><strong>Team:</strong> ${data.teamName}</p>
-      <p><strong>Title:</strong> Title ${data.titleNum} – ${TITLES.find(t=>t.num==data.titleNum)?.ops}</p>
-      <p><strong>Rep:</strong> ${data.repName} (${data.repEmail})</p>
-      <p><strong>Members:</strong> ${members.map(m=>getName(m)).join(', ')}</p>
-      <p><strong>Date:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
-      <p style="color:var(--gold);">📸 Screenshot this for your records.</p>
+      <h2 style="color:#38bdf8;">✅ Registration Confirmed</h2>
+      <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Team:</strong> ${data.teamName}</p>
+      <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Title:</strong> Title ${data.titleNum} – ${TITLES.find(t=>t.num==data.titleNum)?.ops}</p>
+      <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Rep:</strong> ${data.repName}</p>
+      <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Email:</strong> ${data.repEmail}</p>
+      <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Members:</strong> ${members.map(m=>getName(m)).join(', ')}</p>
+      <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Date:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+      <p style="color:#f59e0b; font-weight:bold;">📸 Screenshot this for your records.</p>
       <button class="btn" onclick="document.getElementById('confirmModal').classList.add('hidden')">Close</button>
     `;
     modal.classList.remove('hidden');
+
 
     document.getElementById('regForm').reset();
     document.getElementById('member5Select').disabled = true;
@@ -732,12 +743,12 @@
     const students = await getStudentList();
     const regDiv = document.getElementById('adminRegList');
     regDiv.innerHTML = Object.entries(regs).map(([key, val]) => `
-      <div style="border:1px solid #334155;padding:10px;margin-bottom:8px;border-radius:8px;">
-        <strong>${key}:</strong> ${val.teamName} (${val.repName})<br>
-        <small>${[val.m1,val.m2,val.m3,val.m4,val.m5].filter(Boolean).map(m=>students.find(s=>s.matric===m)?.name||m).join(', ')}</small>
-        <br><button class="btn btn-sm btn-red" data-delete="${key}">Delete</button>
-      </div>
-    `).join('');
+        <div style="border:1px solid #334155;padding:10px;margin-bottom:8px;border-radius:8px;background:#1e293b;color:#e2e8f0;">
+          <strong style="color:#fff;">${key}:</strong> <span style="color:#e2e8f0;">${val.teamName} (${val.repName})</span><br>
+          <small style="color:#cbd5e1;">${[val.m1,val.m2,val.m3,val.m4,val.m5].filter(Boolean).map(m=>students.find(s=>s.matric===m)?.name||m).join(', ')}</small>
+          <br><button class="btn btn-sm btn-red" data-delete="${key}">Delete</button>
+        </div>
+      `).join('');
     document.querySelectorAll('[data-delete]').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (confirm('Delete this registration?')) {
@@ -746,14 +757,45 @@
         }
       });
     });
-
+    
+// Unassigned students
+    const unassignedDiv = document.getElementById('unassignedStudents');
+    if (unassignedDiv) {
+      const allMatrics = new Set(students.map(s => s.matric));
+      const assignedMatrics = new Set();
+      Object.values(regs).forEach(r => {
+        [r.m1, r.m2, r.m3, r.m4, r.m5].filter(Boolean).forEach(m => assignedMatrics.add(m));
+      });
+      const unassigned = students.filter(s => !assignedMatrics.has(s.matric));
+      const assigned = students.filter(s => assignedMatrics.has(s.matric));
+      unassignedDiv.innerHTML = `
+        <strong style="color:#ef4444;">🔴 Unassigned Students (${unassigned.length})</strong>
+        <div style="max-height:200px; overflow-y:auto; margin-top:8px;">
+          ${unassigned.map(s => `<div style="color:#fca5a5; padding:3px 0; font-size:0.85rem;">${s.name} (${s.matric})</div>`).join('') || '<span style="color:#94a3b8;">All students assigned! ✅</span>'}
+        </div>
+        <details style="margin-top:8px;">
+          <summary style="color:#10b981; cursor:pointer;">✅ Already Assigned (${assigned.length})</summary>
+          <div style="max-height:150px; overflow-y:auto; margin-top:5px;">
+            ${assigned.map(s => {
+              let groupInfo = '';
+              Object.entries(regs).forEach(([key, val]) => {
+                if ([val.m1, val.m2, val.m3, val.m4, val.m5].includes(s.matric)) {
+                  groupInfo = `${key} – ${val.teamName}`;
+                }
+              });
+              return `<div style="color:#86efac; padding:2px 0; font-size:0.8rem;">${s.name} → ${groupInfo}</div>`;
+            }).join('')}
+          </div>
+        </details>
+      `;
+    }
     const studDiv = document.getElementById('studentListAdmin');
     studDiv.innerHTML = students.map(s => `
-      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e293b;">
-        <span>${s.name} (${s.matric})</span>
-        <button class="btn btn-sm btn-red" data-rm="${s.matric}" style="padding:2px 10px;">X</button>
-      </div>
-    `).join('');
+        <div style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid #334155;color:#e2e8f0;background:#1e293b;border-radius:4px;margin-bottom:2px;">
+          <span style="color:#e2e8f0;">${s.name} (${s.matric})</span>
+          <button class="btn btn-sm btn-red" data-rm="${s.matric}" style="padding:2px 10px;">X</button>
+        </div>
+      `).join('');
     document.querySelectorAll('[data-rm]').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (confirm('Remove this student?')) {
