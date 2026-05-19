@@ -572,8 +572,9 @@
   }
 
   async function refreshTitleSelect() {
-    const regs = await getRegistrations();
     const sel = document.getElementById('titleSelect');
+    if (!sel) return;
+    const regs = await getRegistrations();
     sel.innerHTML = '<option value="">-- Choose a title --</option>';
     TITLES.forEach(t => {
       const taken = regs[`title${t.num}`];
@@ -615,12 +616,11 @@
   }
 
   // ---------- Form Submit ----------
-  document.getElementById('regForm').addEventListener('submit', async function(e) {
+   document.getElementById('regForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const teamName = document.getElementById('teamName').value.trim();
     const repMatric = document.getElementById('repSelect').value;
     const repEmail = document.getElementById('repEmail').value.trim();
-          // Auto-assign random title below
     const titleErr = document.getElementById('titleError');
     titleErr.textContent = '';
 
@@ -633,7 +633,7 @@
     const fifthVal = document.getElementById('member5Select').value;
     if (fifthCheck && fifthVal) members.push(fifthVal);
 
-    if (!teamName || !repMatric || !repEmail || !titleNum) {
+    if (!teamName || !repMatric || !repEmail) {
       alert('Please fill all required fields.'); return;
     }
     if (members.length < 4) {
@@ -648,14 +648,16 @@
     }
 
     const regs = await getRegistrations();
-          // Randomly assign an available title
-      const available = TITLES.filter(t => !regs[`title${t.num}`]);
-      if (available.length === 0) {
-        if (titleErr) titleErr.textContent = 'No titles available. Contact lecturer.';
-        return;
-      }
-      const randomTitle = available[Math.floor(Math.random() * available.length)];
-      const titleNum = randomTitle.num;
+    
+    // Randomly assign an available title
+    const available = TITLES.filter(t => !regs[`title${t.num}`]);
+    if (available.length === 0) {
+      if (titleErr) titleErr.textContent = 'No titles available. Contact lecturer.';
+      return;
+    }
+    const randomTitle = available[Math.floor(Math.random() * available.length)];
+    const titleNum = randomTitle.num;
+    
     // Duplicate email check
     for (let [key, val] of Object.entries(regs)) {
       if (val.repEmail === repEmail) {
@@ -713,7 +715,7 @@
     document.getElementById('member5Select').disabled = true;
     document.getElementById('fifthMemberCheck').checked = false;
     await refreshAllDropdowns();
-    await refreshTitleSelect();
+    //await refreshTitleSelect();
     await refreshTitleSummary();
     await refreshDashboard();
   });
@@ -935,7 +937,7 @@
   // ---------- Initial Load ----------
   (async function init() {
     await refreshAllDropdowns();
-    await refreshTitleSelect();
+    //await refreshTitleSelect();
     await refreshTitleSummary();
     await refreshDashboard();
     getRegistrationsLive(() => { refreshDashboard(); refreshTitleSummary(); refreshTitleSelect(); });
