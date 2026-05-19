@@ -180,6 +180,14 @@
       .grid { grid-template-columns: 1fr; }
       .header h1 { font-size: 2rem; }
     }
+      @media print {
+      body { background: #fff; }
+      .app-wrapper, .nav-tabs, .tab-content, footer, .btn { display: none !important; }
+      .modal-overlay { position: static; background: #fff; }
+      .modal { background: #fff; border: 2px solid #000; color: #000; box-shadow: none; }
+      .modal h2, .modal p, .modal strong { color: #000 !important; }
+      .modal .btn { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -224,20 +232,17 @@
         </ul>
       </div>
     </div>
-    <div class="panel">
-      <h3><i class="fas fa-list-ol"></i> Available Titles (22)</h3>
-      <div id="titleSummary" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:10px; color:var(--text);"></div>
-    </div>
+    
     <div class="panel">
       <h3><i class="fas fa-file-pdf"></i> Technical Report Breakdown (max 10 pages)</h3>
       <div class="grid">
-        <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>01. Front Page</strong><br><span style="color:#94a3b8;">Official template</span></div>
-        <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>02. Objectives</strong><br><span style="color:#94a3b8;">Verification goals</span></div>
-        <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>03. Introduction</strong><br><span style="color:#94a3b8;">Sequential logic background</span></div>
-        <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>04. Block Diagram</strong><br><span style="color:#94a3b8;">Hardware structure</span></div>
-        <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>05. Verilog Coding</strong><br><span style="color:#94a3b8;">Modules & testbenches</span></div>
-        <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>06. Results & Discussion</strong><br><span style="color:#94a3b8;">Waveforms, figures</span></div>
-        <div style="background:#1e293b; padding:10px; border-radius:8px;"><strong>07. Conclusion</strong><br><span style="color:#94a3b8;">Summary & analysis</span></div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border-left:3px solid var(--accent);"><strong style="color:#fff;">01. Front Page</strong><br><span style="color:#cbd5e1;">Official template</span></div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border-left:3px solid var(--accent);"><strong style="color:#fff;">02. Objectives</strong><br><span style="color:#cbd5e1;">Verification goals</span></div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border-left:3px solid var(--accent);"><strong style="color:#fff;">03. Introduction</strong><br><span style="color:#cbd5e1;">Sequential logic background</span></div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border-left:3px solid var(--accent);"><strong style="color:#fff;">04. Block Diagram</strong><br><span style="color:#cbd5e1;">Hardware structure</span></div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border-left:3px solid var(--accent);"><strong style="color:#fff;">05. Verilog Coding</strong><br><span style="color:#cbd5e1;">Modules & testbenches</span></div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border-left:3px solid var(--accent);"><strong style="color:#fff;">06. Results & Discussion</strong><br><span style="color:#cbd5e1;">Waveforms, figures</span></div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border-left:3px solid var(--accent);"><strong style="color:#fff;">07. Conclusion</strong><br><span style="color:#cbd5e1;">Summary & analysis</span></div>
       </div>
     </div>
     <div class="panel" style="border-color: rgba(239,68,68,0.5);">
@@ -254,6 +259,10 @@
           <span style="color:#cbd5e1; font-size:0.9rem;">Upload PDF report + walkthrough video.</span>
         </div>
       </div>
+    </div>
+    <div class="panel">
+      <h3><i class="fas fa-list-ol"></i> Available Titles (22)</h3>
+      <div id="titleSummary" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:10px; color:var(--text);"></div>
     </div>
   </div>
 
@@ -295,8 +304,17 @@
     </div>
   </div>
 
-  <!-- TAB: Dashboard -->
+    <!-- TAB: Dashboard -->
   <div class="tab-content" id="tab-dashboard">
+    <div class="panel" style="margin-bottom:20px;">
+      <h3><i class="fas fa-search"></i> Retrieve Your Registration</h3>
+      <p style="color:#cbd5e1; font-size:0.9rem;">Enter your email or matric number to view your submission again.</p>
+      <div class="flex-row" style="margin-top:10px;">
+        <input type="text" id="lookupInput" placeholder="Email or Matric Number" style="flex:1;" />
+        <button class="btn btn-sm" id="lookupBtn"><i class="fas fa-search"></i> Search</button>
+      </div>
+      <div id="lookupError" style="color:#ef4444; font-size:0.85rem; margin-top:5px;"></div>
+    </div>
     <div class="panel">
       <h3><i class="fas fa-table"></i> Live Registration Dashboard</h3>
       <div style="overflow-x:auto;">
@@ -678,7 +696,8 @@
       <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Members:</strong> ${members.map(m=>getName(m)).join(', ')}</p>
       <p style="color:#e2e8f0;"><strong style="color:#ffffff;">Date:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
       <p style="color:#f59e0b; font-weight:bold;">📸 Screenshot this for your records.</p>
-      <button class="btn" onclick="document.getElementById('confirmModal').classList.add('hidden')">Close</button>
+      <button class="btn btn-green" onclick="window.print()" style="margin-right:10px;">📥 Download PDF</button>
+          <button class="btn" onclick="document.getElementById('confirmModal').classList.add('hidden')">Close</button>
     `;
     modal.classList.remove('hidden');
 
@@ -757,7 +776,7 @@
         }
       });
     });
-    
+
 // Unassigned students
     const unassignedDiv = document.getElementById('unassignedStudents');
     if (unassignedDiv) {
@@ -803,6 +822,68 @@
           renderAdminPanel(); refreshAllDropdowns();
         }
       });
+    });
+  }
+
+    // Lookup registration by email or matric
+  const lookupBtn = document.getElementById('lookupBtn');
+  if (lookupBtn) {
+    lookupBtn.addEventListener('click', async () => {
+      const query = document.getElementById('lookupInput').value.trim().toLowerCase();
+      const lookupErr = document.getElementById('lookupError');
+      if (lookupErr) lookupErr.textContent = '';
+      if (!query) { if (lookupErr) lookupErr.textContent = 'Enter email or matric number.'; return; }
+      
+      const regs = await getRegistrations();
+      const students = await getStudentList();
+      const getName = (m) => students.find(s => s.matric === m)?.name || m;
+      
+            let results = [];
+      for (let [key, val] of Object.entries(regs)) {
+        const allMembers = [val.m1, val.m2, val.m3, val.m4, val.m5, val.repMatric].filter(Boolean);
+        const allMemberNames = allMembers.map(m => getName(m).toLowerCase());
+        if (val.repEmail?.toLowerCase() === query || allMembers.includes(query) || allMemberNames.some(n => n.includes(query))) {
+          results.push({ key, val });
+        }
+      }
+      
+      if (results.length === 0) {
+        if (lookupErr) lookupErr.textContent = 'No registration found. Check your name, email, or matric number.';
+        return;
+      }
+      
+      const modal = document.getElementById('confirmModal');
+      const content = document.getElementById('confirmContent');
+      
+      if (results.length === 1) {
+        const { val } = results[0];
+        const members = [val.m1, val.m2, val.m3, val.m4, val.m5].filter(Boolean);
+        content.innerHTML = `
+          <h2 style="color:#38bdf8;">✅ Your Registration</h2>
+          <p style="color:#e2e8f0;"><strong style="color:#fff;">Team:</strong> ${val.teamName}</p>
+          <p style="color:#e2e8f0;"><strong style="color:#fff;">Title:</strong> Title ${val.titleNum} – ${TITLES.find(t=>t.num==val.titleNum)?.ops}</p>
+          <p style="color:#e2e8f0;"><strong style="color:#fff;">Rep:</strong> ${val.repName}</p>
+          <p style="color:#e2e8f0;"><strong style="color:#fff;">Email:</strong> ${val.repEmail}</p>
+          <p style="color:#e2e8f0;"><strong style="color:#fff;">Members:</strong> ${members.map(m=>getName(m)).join(', ')}</p>
+          <p style="color:#e2e8f0;"><strong style="color:#fff;">Date:</strong> ${new Date(val.timestamp).toLocaleString()}</p>
+          <p style="color:#f59e0b; font-weight:bold;">📸 Screenshot or print this for your records.</p>
+          <button class="btn btn-green" onclick="window.print()" style="margin-right:10px;">📥 Download PDF</button>
+          <button class="btn" onclick="document.getElementById('confirmModal').classList.add('hidden')">Close</button>
+        `;
+      } else {
+        content.innerHTML = `
+          <h2 style="color:#f59e0b;">🔍 Multiple Results Found (${results.length})</h2>
+          <p style="color:#e2e8f0;">Please search using your matric number for a precise match:</p>
+          ${results.map(r => `
+            <div style="background:#1e293b; padding:12px; border-radius:8px; margin-bottom:8px; border-left:3px solid var(--accent);">
+              <p style="color:#e2e8f0; margin:0;"><strong style="color:#fff;">${r.val.teamName}</strong> – Title ${r.val.titleNum}</p>
+              <p style="color:#cbd5e1; margin:4px 0 0 0; font-size:0.85rem;">Members: ${[r.val.m1, r.val.m2, r.val.m3, r.val.m4, r.val.m5].filter(Boolean).map(m=>getName(m)).join(', ')}</p>
+            </div>
+          `).join('')}
+          <button class="btn" onclick="document.getElementById('confirmModal').classList.add('hidden')">Close</button>
+        `;
+      }
+      modal.classList.remove('hidden');
     });
   }
 
